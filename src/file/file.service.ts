@@ -1,9 +1,14 @@
 import { Get, Injectable } from '@nestjs/common';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
+import { File } from './schemas/file.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
-export class FolderService {
+export class FileService {
+    constructor(@InjectModel(File.name) private fileModel: Model<File>){}
+
     folderData: CreateFileDto[] = [
         {
             "id": 0,
@@ -21,9 +26,9 @@ export class FolderService {
         return this.folderData.find((element) => element.id === id)
     }
 
-    createFile(folderDto: CreateFileDto){
-        this.folderData.push(folderDto)
-        return this.folderData
+    async createFile(createFileDto: CreateFileDto): Promise<File>{
+        const createdFile = new this.fileModel(createFileDto)
+        return createdFile.save()
     }
 
     updateFile(id: number, updateFileDto: UpdateFileDto){

@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { FileService } from './file.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
+import { File } from './schemas/file.schema';
 
 @Controller('file')
 export class FileController {
@@ -9,7 +10,7 @@ export class FileController {
 
     @Get()
     async getAllFile(){
-        return this.fileService.getAllFile();
+        return this.fileService.findAll();
     }
 
     @Post()

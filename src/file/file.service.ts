@@ -1,4 +1,4 @@
-import { Get, Injectable } from '@nestjs/common';
+import { Get, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { File } from './schemas/file.schema';
@@ -11,19 +11,19 @@ export class FileService {
 
     folderData: CreateFileDto[] = [
         {
-            "id": 0,
+            "treeId": 0,
             "name": "root",
             "childrens": [],
             "root": -1
          }
     ];
 
-    getAllFile(){
-        return this.folderData;
+    async findAll(){
+        return this.fileModel.find().exec();
     }
 
     findOne(id: number){
-        return this.folderData.find((element) => element.id === id)
+        return this.folderData.find((element) => element.treeId === id)
     }
 
     async createFile(createFileDto: CreateFileDto): Promise<File>{
@@ -31,22 +31,21 @@ export class FileService {
         return createdFile.save()
     }
 
-    updateFile(id: number, updateFileDto: UpdateFileDto){
-        const file = this.folderData.find((element) => {
-            return element.id === id; // Return the comparison result
-        });
+    async updateFile(treeID: number, updateFileDto: UpdateFileDto): Promise<File>{
+        const updatedFile = await this.fileModel.findOneAndUpdate( { treeID } , {$push: {childrens: updateFileDto.children}}, {
+            new: true,
+            runValidators: true
+        })
 
-        if (!file){
-            return 'File not found';
+        if (!updatedFile){
+               throw new NotFoundException(`File with treeID ${treeID} not found`);
         }
-        const updatedFile = {...this.folderData[id], ...updateFileDto};
-        this.folderData[id] = updatedFile;
 
         return updatedFile;
     }
 
     deleteFile(id: number){
-        const deleteIndex = this.folderData.findIndex(value => value.id === id);
+        const deleteIndex = this.folderData.findIndex(value => value.treeId === id);
         if(deleteIndex === -1)
             return 'File Not Found'
         

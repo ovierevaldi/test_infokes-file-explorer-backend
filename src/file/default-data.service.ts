@@ -17,8 +17,10 @@ export class DefaultDataService implements OnModuleInit{
         // Create root default data
         if(count === 0){
             const rootFileData = new this.fileModel({
+                treeID: 0,
                 name: 'root',
-                children: [],
+                type: 'folder',
+                childrens: [],
                 root: -1
             })
             await rootFileData.save()

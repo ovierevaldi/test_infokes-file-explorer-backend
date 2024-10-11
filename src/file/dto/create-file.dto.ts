@@ -1,6 +1,6 @@
 export class CreateFileDto{
-    id: number;
+    treeId: number;
     name: string;
-    childrens: [];
+    childrens: number[];
     root: number;
 }
